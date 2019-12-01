@@ -20,9 +20,15 @@ func Migrate() error {
 	}
 
 	err = m.Up()
+
 	if err != nil {
+		if err.Error() == "no change" {
+			return nil
+		}
+
 		return err
 	}
+
 	version, _, err := m.Version()
 	if err != nil {
 		return err

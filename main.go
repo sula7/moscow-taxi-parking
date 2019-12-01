@@ -1,6 +1,7 @@
 package main
 
 import (
+	v1 "github.com/sula7/moscow-taxi-parking/v1"
 	"log"
 
 	"github.com/sula7/moscow-taxi-parking/http"
@@ -22,4 +23,6 @@ func main() {
 	if err != nil {
 		log.Fatalln("error inserting to DB: ", err)
 	}
+
+	v1.NewAPI()
 }
