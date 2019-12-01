@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/sula7/moscow-taxi-parking/structs"
+	"github.com/sula7/moscow-taxi-parking/models"
 )
 
-func SendRequest() (*structs.Parkings, error) {
+func MakeRequest() (*models.Parkings, error) {
 	url := "https://data.gov.ru/opendata/7704786030-taxiparking/data-20190906T0100.json?encoding=UTF-8"
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
@@ -36,7 +36,7 @@ func SendRequest() (*structs.Parkings, error) {
 		}
 	}
 
-	parkings := structs.Parkings{}
+	parkings := models.Parkings{}
 	err = json.Unmarshal(body, &parkings.Parking)
 	if err != nil {
 		return nil, err

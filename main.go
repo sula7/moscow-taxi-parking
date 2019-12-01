@@ -1,28 +1,47 @@
 package main
 
 import (
-	v1 "github.com/sula7/moscow-taxi-parking/v1"
-	"log"
+	"github.com/sirupsen/logrus"
 
 	"github.com/sula7/moscow-taxi-parking/http"
 	"github.com/sula7/moscow-taxi-parking/storage"
+	v1 "github.com/sula7/moscow-taxi-parking/v1"
 )
 
 func main() {
-	parkings, err := http.SendRequest()
+	parkings, err := http.MakeRequest()
 	if err != nil {
-		log.Fatalln("error while http GET: ", err)
+		logrus.WithFields(logrus.Fields{
+			"function:": "http.MakeRequest()",
+			"err:":      err,
+		}).Fatalln("error while http GET")
 	}
 
-	err = storage.Migrate()
+	store, err := storage.New("root:root@tcp(localhost:3306)/parkings")
 	if err != nil {
-		log.Fatalln("Unable to run DB migrations: ", err)
+		logrus.WithFields(logrus.Fields{
+			"function:": "storage.New()",
+			"err:":      err,
+		}).Fatalln("error creating new storage")
 	}
 
-	err = storage.CreateParking(parkings)
+	defer store.Close()
+
+	err = storage.Migrate("mysql://root:root@tcp(localhost:3306)/parkings")
 	if err != nil {
-		log.Fatalln("error inserting to DB: ", err)
+		logrus.WithFields(logrus.Fields{
+			"function:": "storage.Migrate()",
+			"err:":      err,
+		}).Fatalln("Unable to run DB migrations")
 	}
 
-	v1.NewAPI()
+	err = store.CreateParkings(parkings)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"function:": "store.CreateParkings()",
+			"err:":      err,
+		}).Fatalln("error creating parkings info in DB")
+	}
+
+	v1.NewAPI(store)
 }
