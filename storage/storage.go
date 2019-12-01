@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"database/sql"
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -23,7 +24,11 @@ func CreateParking(parkings *structs.Parkings) error {
 	}
 
 	for _, v := range parkings.Parking {
-		_, err = tx.Exec(`INSERT INTO parkings.moscow
+		var id int64
+		err = dbConn.Get(&id, `SELECT id FROM parkings.moscow WHERE id_ru = ?`, v.ID)
+
+		if err == sql.ErrNoRows {
+			_, err = tx.Exec(`INSERT INTO parkings.moscow
     (global_id,
      system_object_id,
      id_ru,
@@ -45,28 +50,29 @@ func CreateParking(parkings *structs.Parkings) error {
      car_capacity_en,
      mode_en)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-			v.GlobalID,
-			v.SystemObjectID,
-			v.ID,
-			v.Name,
-			v.AdmArea,
-			v.District,
-			v.Address,
-			v.LongitudeWGS84,
-			v.LatitudeWGS84,
-			v.CarCapacity,
-			v.Mode,
-			v.IDEn,
-			v.NameEn,
-			v.AdmAreaEn,
-			v.DistrictEn,
-			v.AddressEn,
-			v.LongitudeWGS84En,
-			v.LatitudeWGS84En,
-			v.CarCapacityEn,
-			v.ModeEn)
-		if err != nil {
-			return err
+				v.GlobalID,
+				v.SystemObjectID,
+				v.ID,
+				v.Name,
+				v.AdmArea,
+				v.District,
+				v.Address,
+				v.LongitudeWGS84,
+				v.LatitudeWGS84,
+				v.CarCapacity,
+				v.Mode,
+				v.IDEn,
+				v.NameEn,
+				v.AdmAreaEn,
+				v.DistrictEn,
+				v.AddressEn,
+				v.LongitudeWGS84En,
+				v.LatitudeWGS84En,
+				v.CarCapacityEn,
+				v.ModeEn)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
