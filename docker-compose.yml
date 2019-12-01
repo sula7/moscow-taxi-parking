@@ -1,0 +1,30 @@
+version: '3.2'
+
+volumes:
+  tmp-data:
+  mysql-data:
+
+services:
+  app:
+    image: golang:1.13-stretch
+    working_dir: /src
+    environment:
+      HOME: /tmp
+      GOPATH: /tmp
+    volumes:
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/group:/etc/group:ro
+      - .:/src:cached
+      - tmp-data:/tmp:cached
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0.18
+    volumes:
+      - mysql-data:/data:cached
+    environment:
+      MYSQL_DATABASE: mysql
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 127.0.0.1:3306:3306

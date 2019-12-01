@@ -1,27 +1,60 @@
 package http
 
 import (
-	"fmt"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"os"
+
+	"github.com/sula7/moscow-taxi-parking/structs"
 )
 
-func SendRequest() error {
+func SendRequest() (*structs.Parkings, error) {
 	url := "https://data.gov.ru/opendata/7704786030-taxiparking/data-20190906T0100.json?encoding=UTF-8"
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
+
 	defer resp.Body.Close()
 
-	fmt.Printf("response Status:\n%s", resp.Status)
-	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Printf("response Body:\n%s", string(body))
-	return nil
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.Status != "200" {
+		body, err = ReadLocalJson("./local/data-20190906T0100.json")
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	parkings := structs.Parkings{}
+	err = json.Unmarshal(body, &parkings.Parking)
+	if err != nil {
+		return nil, err
+	}
+
+	return &parkings, nil
+}
+
+func ReadLocalJson(filePath string) ([]byte, error) {
+	byteFile, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	file, err := ioutil.ReadAll(byteFile)
+	if err != nil {
+		return nil, err
+	}
+
+	return file, nil
 }
