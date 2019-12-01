@@ -7,6 +7,16 @@ type (
 		Parking Parking `json:"parking"`
 	}
 
+	ListResponse struct {
+		Success  bool      `json:"success"`
+		Message  string    `json:"message"`
+		Parkings []Parking `json:"parking"`
+	}
+
+	Request struct {
+		Mode string `json:"mode"`
+	}
+
 	Parkings struct {
 		Parking []Parking
 	}

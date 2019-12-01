@@ -19,6 +19,7 @@ type (
 		CreateParkings(parkings *models.Parkings) error
 		GetParkingById(parkingID string) (parking models.Parking, err error)
 		GetParkingByGlobalId(globalID string) (parking models.Parking, err error)
+		GetParkingsByMode(mode string, page, maxParkingsPerPage int) (parking []models.Parking, err error)
 	}
 
 	Storage struct {
@@ -173,5 +174,30 @@ func (s *Storage) GetParkingByGlobalId(globalID string) (parking models.Parking,
        lat_en,
        car_capacity_en,
        mode_en FROM parkings.moscow WHERE global_id = ?`, globalID)
+	return parking, err
+}
+
+func (s *Storage) GetParkingsByMode(mode string, page, maxParkingsPerPage int) (parking []models.Parking, err error) {
+	err = s.db.Select(&parking, `SELECT
+       id_ru,
+       global_id,
+       system_object_id,
+       name, adm_area,
+       district,
+       address,
+       lon,
+       lat,
+       car_capacity,
+       mode,
+       id_en,
+       name_en,
+       adm_area_en,
+       district_en,
+       address_en,
+       lon_en,
+       lat_en,
+       car_capacity_en,
+       mode_en FROM parkings.moscow WHERE mode = ? ORDER BY moscow.id_ru LIMIT ?, ?`,
+		mode, (page-1)*maxParkingsPerPage, maxParkingsPerPage)
 	return parking, err
 }
