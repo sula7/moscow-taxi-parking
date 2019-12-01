@@ -23,6 +23,7 @@ services:
     image: mysql:8.0.18
     volumes:
       - mysql-data:/data:cached
+      - ./migrations/create_DB_docker.sql:/docker-entrypoint-initdb.d/create_DB_docker.sql
     environment:
       MYSQL_DATABASE: mysql
       MYSQL_ROOT_PASSWORD: root

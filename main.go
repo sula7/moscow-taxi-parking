@@ -10,11 +10,16 @@ import (
 func main() {
 	parkings, err := http.SendRequest()
 	if err != nil {
-		log.Panicf("error while http GET:%v", err)
+		log.Fatalln("error while http GET: ", err)
+	}
+
+	err = storage.Migrate()
+	if err != nil {
+		log.Fatalln("Unable to run DB migrations: ", err)
 	}
 
 	err = storage.CreateParking(parkings)
 	if err != nil {
-		log.Panicf("error inserting to DB:%v\n", err)
+		log.Fatalln("error inserting to DB: ", err)
 	}
 }

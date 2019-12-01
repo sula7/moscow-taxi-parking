@@ -5,10 +5,32 @@ import (
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/mysql"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jmoiron/sqlx"
 
 	"github.com/sula7/moscow-taxi-parking/structs"
 )
+
+func Migrate() error {
+	m, err := migrate.New("file://migrations/", "mysql://root:root@tcp(localhost:3306)/parkings")
+	if err != nil {
+		return err
+	}
+
+	err = m.Up()
+	if err != nil {
+		return err
+	}
+	version, _, err := m.Version()
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Migration success. Current version: ", version)
+	return nil
+}
 
 func CreateParking(parkings *structs.Parkings) error {
 	dbConn, err := sqlx.Connect("mysql", "root:root@tcp(localhost:3306)/parkings")
