@@ -9,6 +9,10 @@ func ping(c echo.Context) error {
 	return c.String(http.StatusOK, "pong")
 }
 
-func parking(c echo.Context) error {
+func parkingRU(c echo.Context) error {
+	return nil
+}
+
+func parkingEN(c echo.Context) error {
 	return nil
 }

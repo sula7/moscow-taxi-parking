@@ -13,8 +13,11 @@ func NewAPI() {
 
 	e.GET("/ping", ping)
 
-	g := e.Group("/api/v1")
-	g.GET("/parking/:id", parking)
+	groupRU := e.Group("/api/v1/ru")
+	groupRU.GET("/parking/:id", parkingRU)
+
+	groupEN := e.Group("/api/v1/en")
+	groupEN.GET("/parking/:id", parkingEN)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
