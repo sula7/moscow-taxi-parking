@@ -17,7 +17,8 @@ type (
 		Close()
 
 		CreateParkings(parkings *models.Parkings) error
-		GetParkingByIdRU(parkingID string) (parking models.Parking, err error)
+		GetParkingById(parkingID string) (parking models.Parking, err error)
+		GetParkingByGlobalId(globalID string) (parking models.Parking, err error)
 	}
 
 	Storage struct {
@@ -127,7 +128,7 @@ func (s *Storage) CreateParkings(parkings *models.Parkings) error {
 	return nil
 }
 
-func (s *Storage) GetParkingByIdRU(parkingID string) (parking models.Parking, err error) {
+func (s *Storage) GetParkingById(parkingID string) (parking models.Parking, err error) {
 	err = s.db.Get(&parking, `SELECT
        id_ru,
        global_id,
@@ -148,5 +149,29 @@ func (s *Storage) GetParkingByIdRU(parkingID string) (parking models.Parking, er
        lat_en,
        car_capacity_en,
        mode_en FROM parkings.moscow WHERE id_ru = ?`, parkingID)
+	return parking, err
+}
+
+func (s *Storage) GetParkingByGlobalId(globalID string) (parking models.Parking, err error) {
+	err = s.db.Get(&parking, `SELECT
+       id_ru,
+       global_id,
+       system_object_id,
+       name, adm_area,
+       district,
+       address,
+       lon,
+       lat,
+       car_capacity,
+       mode,
+       id_en,
+       name_en,
+       adm_area_en,
+       district_en,
+       address_en,
+       lon_en,
+       lat_en,
+       car_capacity_en,
+       mode_en FROM parkings.moscow WHERE global_id = ?`, globalID)
 	return parking, err
 }

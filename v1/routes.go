@@ -32,6 +32,7 @@ func NewAPI(store storage.ParkingStorage) {
 
 	groupRU := e.Group("/api/v1")
 	groupRU.GET("/parking/id/:id", v1.parkingInfoByID)
+	groupRU.GET("/parking/global-id/:id", v1.parkingInfoByGlobalID)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
