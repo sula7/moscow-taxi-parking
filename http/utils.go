@@ -9,9 +9,9 @@ import (
 	"github.com/sula7/moscow-taxi-parking/models"
 )
 
-func MakeRequest() (*models.Parkings, error) {
+func GetParkingFromSource(fileName string) (*models.Parkings, error) {
 	url := "https://data.gov.ru/opendata/7704786030-taxiparking/data-20190906T0100.json?encoding=UTF-8"
-	req, err := http.NewRequest("POST", url, nil)
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func MakeRequest() (*models.Parkings, error) {
 	}
 
 	if resp.Status != "200" {
-		body, err = ReadLocalJson("./local/data-20190906T0100.json")
+		body, err = ReadLocalJson(fileName)
 		if err != nil {
 			return nil, err
 		}
@@ -45,8 +45,8 @@ func MakeRequest() (*models.Parkings, error) {
 	return &parkings, nil
 }
 
-func ReadLocalJson(filePath string) ([]byte, error) {
-	byteFile, err := os.Open(filePath)
+func ReadLocalJson(fileName string) ([]byte, error) {
+	byteFile, err := os.Open("./local/" + fileName)
 	if err != nil {
 		return nil, err
 	}

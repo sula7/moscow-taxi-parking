@@ -5,7 +5,11 @@ As a storage using Redis.
 
 ### ENV
 ````
-
+BIND_PORT=  HTTP server's listen port (Default is :8080)
+DB_CONN=    Required. Redis DB connection string like "localhost:6379"
+DB_PWD=     Redis DB password (Default is "")
+FILE_NAME=  In case if data source is unavailable put json file to ./local/ and set file name
+(Default is "data-20190906T0100.json")
 ````
 
 ### HTTP methods

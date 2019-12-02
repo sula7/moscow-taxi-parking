@@ -24,10 +24,10 @@ type (
 	}
 )
 
-func New(connString string) *Storage {
+func New(DSN, DbPWD string) *Storage {
 	dbConn := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
+		Addr:     DSN,
+		Password: DbPWD,
 		DB:       0,
 	})
 	return &Storage{db: dbConn}

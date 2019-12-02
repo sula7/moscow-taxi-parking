@@ -19,7 +19,7 @@ type (
 	}
 )
 
-func NewAPI(store storage.ParkingStorage) {
+func NewAPI(store storage.ParkingStorage, bindAddress string) {
 	e := echo.New()
 
 	v1 := V1{
@@ -36,5 +36,5 @@ func NewAPI(store storage.ParkingStorage) {
 	groupRU.GET("/parking/global-id/:id", v1.parkingInfoByGlobalID)
 	groupRU.POST("/parking/mode", v1.parkingInfoByMode)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(bindAddress))
 }
