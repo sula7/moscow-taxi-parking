@@ -43,26 +43,27 @@ func (v1 V1) parkingInfoByID(c echo.Context) error {
 }
 
 func (v1 V1) parkingInfoByGlobalID(c echo.Context) error {
-	parking, err := v1.store.GetParkingByGlobalId(c.Param("id"))
-
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return c.JSON(http.StatusInternalServerError, models.Response{
-				Success: false,
-				Message: noInfoOnThisID,
-			})
-		}
-		return c.JSON(http.StatusInternalServerError, models.Response{
-			Success: false,
-			Message: err.Error(),
-		})
-	}
-
-	return c.JSON(http.StatusOK, models.Response{
-		Success: true,
-		Message: "OK",
-		Parking: parking,
-	})
+	//parking, err := v1.store.GetParkingByGlobalId(c.Param("id"))
+	//
+	//if err != nil {
+	//	if err == sql.ErrNoRows {
+	//		return c.JSON(http.StatusInternalServerError, models.Response{
+	//			Success: false,
+	//			Message: noInfoOnThisID,
+	//		})
+	//	}
+	//	return c.JSON(http.StatusInternalServerError, models.Response{
+	//		Success: false,
+	//		Message: err.Error(),
+	//	})
+	//}
+	//
+	//return c.JSON(http.StatusOK, models.Response{
+	//	Success: true,
+	//	Message: "OK",
+	//	Parking: parking,
+	//})
+	return nil
 }
 
 func (v1 V1) parkingInfoByMode(c echo.Context) error {

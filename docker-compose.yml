@@ -2,7 +2,7 @@ version: '3.2'
 
 volumes:
   tmp-data:
-  mysql-data:
+  redis-data:
 
 services:
   app:
@@ -17,15 +17,12 @@ services:
       - .:/src:cached
       - tmp-data:/tmp:cached
     depends_on:
-      - db
+      - redis
 
-  db:
-    image: mysql:8.0.18
+  redis:
+    image: redis:5.0.7
     volumes:
-      - mysql-data:/data:cached
-      - ./migrations/create_DB_docker.sql:/docker-entrypoint-initdb.d/create_DB_docker.sql
-    environment:
-      MYSQL_DATABASE: mysql
-      MYSQL_ROOT_PASSWORD: root
+      - redis-data:/data:cached
     ports:
-      - 127.0.0.1:3306:3306
+      - 6379
+      - '6379:6379'

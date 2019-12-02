@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/sirupsen/logrus"
+	v1 "github.com/sula7/moscow-taxi-parking/v1"
 
 	"github.com/sula7/moscow-taxi-parking/http"
 	"github.com/sula7/moscow-taxi-parking/storage"
-	v1 "github.com/sula7/moscow-taxi-parking/v1"
 )
 
 func main() {
@@ -17,23 +17,9 @@ func main() {
 		}).Fatalln("error while http GET")
 	}
 
-	store, err := storage.New("root:root@tcp(localhost:3306)/parkings")
-	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"function:": "storage.New()",
-			"err:":      err,
-		}).Fatalln("error creating new storage")
-	}
+	store := storage.New("root:root@tcp(localhost:3306)/parkings")
 
 	defer store.Close()
-
-	err = storage.Migrate("mysql://root:root@tcp(localhost:3306)/parkings")
-	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"function:": "storage.Migrate()",
-			"err:":      err,
-		}).Fatalln("Unable to run DB migrations")
-	}
 
 	err = store.CreateParkings(parkings)
 	if err != nil {

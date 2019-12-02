@@ -1,13 +1,9 @@
 package storage
 
 import (
-	"database/sql"
-	"fmt"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/mysql"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/jmoiron/sqlx"
+	"strconv"
+
+	"github.com/go-redis/redis/v7"
 
 	"github.com/sula7/moscow-taxi-parking/models"
 )
@@ -17,187 +13,71 @@ type (
 		Close()
 
 		CreateParkings(parkings *models.Parkings) error
-		GetParkingById(parkingID string) (parking models.Parking, err error)
+		GetParkingById(parkingID string) (parking map[string]string, err error)
 		GetParkingByGlobalId(globalID string) (parking models.Parking, err error)
 		GetParkingsByMode(mode string, page, maxParkingsPerPage int) (parking []models.Parking, err error)
 	}
 
 	Storage struct {
 		ParkingStorage
-		db *sqlx.DB
+		db *redis.Client
 	}
 )
 
-func New(connString string) (*Storage, error) {
-	dbConn, err := sqlx.Connect("mysql", connString)
-	return &Storage{db: dbConn}, err
+func New(connString string) *Storage {
+	dbConn := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
+	return &Storage{db: dbConn}
 }
 
 func (s *Storage) Close() {
 	_ = s.db.Close()
 }
 
-func Migrate(connString string) error {
-	m, err := migrate.New("file://migrations/", connString)
-	if err != nil {
-		return err
-	}
-
-	err = m.Up()
-
-	if err != nil {
-		if err.Error() == "no change" {
-			return nil
-		}
-
-		return err
-	}
-
-	version, _, err := m.Version()
-	if err != nil {
-		return err
-	}
-
-	fmt.Println("Migration success. Current version: ", version)
-	return nil
-}
-
 func (s *Storage) CreateParkings(parkings *models.Parkings) error {
-	tx, err := s.db.Begin()
+	pipe := s.db.TxPipeline()
+
+	for _, parking := range parkings.Parking {
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "ID", parking.Id)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "global_id", parking.GlobalID)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "system_object_id", parking.SystemObjectID)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "name", parking.Name)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "adm_area", parking.AdmArea)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "district", parking.District)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "address", parking.Address)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "lon", parking.LongitudeWGS84)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "lat", parking.LatitudeWGS84)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "car_capacity", parking.CarCapacity)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "mode", parking.Mode)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "id_en", parking.IDEn)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "name_en", parking.NameEn)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "adm_area_en", parking.AdmAreaEn)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "district_en", parking.DistrictEn)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "address_en", parking.AddressEn)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "lon_en", parking.LongitudeWGS84En)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "lat_en", parking.LatitudeWGS84En)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "car_capacity_en", parking.CarCapacityEn)
+		pipe.HSet(strconv.FormatInt(parking.Id, 10), "mode_en", parking.ModeEn)
+	}
+
+	_, err := pipe.Exec()
 	if err != nil {
 		return err
 	}
-
-	for _, v := range parkings.Parking {
-		var id int64
-		err = s.db.Get(&id, `SELECT id FROM parkings.moscow WHERE id_ru = ?`, v.IdRU)
-
-		if err == sql.ErrNoRows {
-			_, err = tx.Exec(`INSERT INTO parkings.moscow
-    (global_id,
-     system_object_id,
-     id_ru,
-     name,
-     adm_area,
-     district,
-     address,
-     lon,
-     lat,
-     car_capacity,
-     mode,
-     id_en,
-     name_en,
-     adm_area_en,
-     district_en,
-     address_en,
-     lon_en,
-     lat_en,
-     car_capacity_en,
-     mode_en)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-				v.GlobalID,
-				v.SystemObjectID,
-				v.IdRU,
-				v.Name,
-				v.AdmArea,
-				v.District,
-				v.Address,
-				v.LongitudeWGS84,
-				v.LatitudeWGS84,
-				v.CarCapacity,
-				v.Mode,
-				v.IDEn,
-				v.NameEn,
-				v.AdmAreaEn,
-				v.DistrictEn,
-				v.AddressEn,
-				v.LongitudeWGS84En,
-				v.LatitudeWGS84En,
-				v.CarCapacityEn,
-				v.ModeEn)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
-func (s *Storage) GetParkingById(parkingID string) (parking models.Parking, err error) {
-	err = s.db.Get(&parking, `SELECT
-       id_ru,
-       global_id,
-       system_object_id,
-       name, adm_area,
-       district,
-       address,
-       lon,
-       lat,
-       car_capacity,
-       mode,
-       id_en,
-       name_en,
-       adm_area_en,
-       district_en,
-       address_en,
-       lon_en,
-       lat_en,
-       car_capacity_en,
-       mode_en FROM parkings.moscow WHERE id_ru = ?`, parkingID)
-	return parking, err
+func (s *Storage) GetParkingById(parkingID string) (parking map[string]string, err error) {
+	return s.db.HGetAll(parkingID).Result()
 }
 
 func (s *Storage) GetParkingByGlobalId(globalID string) (parking models.Parking, err error) {
-	err = s.db.Get(&parking, `SELECT
-       id_ru,
-       global_id,
-       system_object_id,
-       name, adm_area,
-       district,
-       address,
-       lon,
-       lat,
-       car_capacity,
-       mode,
-       id_en,
-       name_en,
-       adm_area_en,
-       district_en,
-       address_en,
-       lon_en,
-       lat_en,
-       car_capacity_en,
-       mode_en FROM parkings.moscow WHERE global_id = ?`, globalID)
 	return parking, err
 }
 
 func (s *Storage) GetParkingsByMode(mode string, page, maxParkingsPerPage int) (parking []models.Parking, err error) {
-	err = s.db.Select(&parking, `SELECT
-       id_ru,
-       global_id,
-       system_object_id,
-       name, adm_area,
-       district,
-       address,
-       lon,
-       lat,
-       car_capacity,
-       mode,
-       id_en,
-       name_en,
-       adm_area_en,
-       district_en,
-       address_en,
-       lon_en,
-       lat_en,
-       car_capacity_en,
-       mode_en FROM parkings.moscow WHERE mode = ? ORDER BY moscow.id_ru LIMIT ?, ?`,
-		mode, (page-1)*maxParkingsPerPage, maxParkingsPerPage)
 	return parking, err
 }
