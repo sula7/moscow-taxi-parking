@@ -14,8 +14,8 @@ type (
 
 		CreateParkings(parkings *models.Parkings) error
 		GetParkingById(parkingID string) (parking map[string]string, err error)
-		GetParkingByGlobalId(globalID string) (parking models.Parking, err error)
-		GetParkingsByMode(mode string, page, maxParkingsPerPage int) (parking []models.Parking, err error)
+		GetParkingByGlobalId(globalID string) (parking map[string]string, err error)
+		GetParkingsByMode(mode string, page, maxParkingsPerPage int64) (parking []map[string]string, err error)
 	}
 
 	Storage struct {
@@ -61,6 +61,9 @@ func (s *Storage) CreateParkings(parkings *models.Parkings) error {
 		pipe.HSet(strconv.FormatInt(parking.Id, 10), "lat_en", parking.LatitudeWGS84En)
 		pipe.HSet(strconv.FormatInt(parking.Id, 10), "car_capacity_en", parking.CarCapacityEn)
 		pipe.HSet(strconv.FormatInt(parking.Id, 10), "mode_en", parking.ModeEn)
+
+		pipe.Set("global_id:"+strconv.FormatInt(parking.GlobalID, 10), parking.Id, 0)
+		pipe.LPush("mode:"+parking.Mode, parking.Id)
 	}
 
 	_, err := pipe.Exec()
@@ -74,10 +77,28 @@ func (s *Storage) GetParkingById(parkingID string) (parking map[string]string, e
 	return s.db.HGetAll(parkingID).Result()
 }
 
-func (s *Storage) GetParkingByGlobalId(globalID string) (parking models.Parking, err error) {
-	return parking, err
+func (s *Storage) GetParkingByGlobalId(globalID string) (parking map[string]string, err error) {
+	id, err := s.db.Get("global_id:" + globalID).Result()
+	if err != nil {
+		return parking, err
+	}
+
+	return s.db.HGetAll(id).Result()
 }
 
-func (s *Storage) GetParkingsByMode(mode string, page, maxParkingsPerPage int) (parking []models.Parking, err error) {
-	return parking, err
+func (s *Storage) GetParkingsByMode(mode string, page, maxParkingsPerPage int64) (parking []map[string]string, err error) {
+	IDs, err := s.db.LRange("mode:"+mode, (page-1)*maxParkingsPerPage, (page-1)*maxParkingsPerPage+(maxParkingsPerPage-1)).Result()
+	if err != nil {
+		return parking, err
+	}
+
+	for _, ID := range IDs {
+		parkingInfo, err := s.db.HGetAll(ID).Result()
+		if err != nil {
+			return parking, err
+		}
+		parking = append(parking, parkingInfo)
+	}
+
+	return parking, nil
 }

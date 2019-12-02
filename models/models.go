@@ -8,9 +8,9 @@ type (
 	}
 
 	ListResponse struct {
-		Success  bool      `json:"success"`
-		Message  string    `json:"message"`
-		Parkings []Parking `json:"parking"`
+		Success  bool                `json:"success"`
+		Message  string              `json:"message"`
+		Parkings []map[string]string `json:"parking"`
 	}
 
 	Request struct {
