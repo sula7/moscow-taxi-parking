@@ -10,10 +10,10 @@ import (
 )
 
 type config struct {
-	BindPort string `env:"BIND_PORT" envDefault:":8080"`
+	BindPort string `env:"BIND_PORT"envDefault:":8080"`
 	DSN      string `env:"DB_CONN,required"`
-	DBPwd    string `env:"DB_PWD",envDefault:""`
-	FileName string `env:"FILE_NAME" envDefault:"data-20190906T0100.json"`
+	DBPwd    string `env:"DB_PWD"envDefault:""`
+	FileName string `env:"FILE_NAME"envDefault:"data-20190906T0100.json"`
 }
 
 func main() {
