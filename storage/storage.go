@@ -132,7 +132,7 @@ func (s *Storage) GetParkingsByMode(mode string, page, maxParkingsPerPage int64)
 	for _, ID := range IDs {
 		parkingInfo, err := s.db.HGetAll(ID).Result()
 		if err != nil {
-			return
+			return parking, err
 		}
 		parking = append(parking, parkingInfo)
 	}

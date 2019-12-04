@@ -14,6 +14,16 @@ FILE_NAME=  In case if data source is unavailable put json file to ./local/ and 
 (Default is "data-20190906T0100.json")
 ````
 
+### Run
+Run by
+`docker-compose up -d`
+after containers up by
+`go run ./main.go`
+
+### Test
+Run by `make test`
+
+
 ### HTTP methods
 ````
 GET /api/v1/parking/id/{ID}
@@ -35,12 +45,3 @@ Body required
 
 Responses parking info
 ````
-
-### How to start
-Run by
-`docker-compose up -d`
-after containers up by
-`go run ./main.go`
-
-### How to test
-Run by `make test`
