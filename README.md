@@ -3,6 +3,9 @@
 API server that gets data from data.gov.ru and takes HTTP requests.
 As a storage using Redis.
 
+At first run app will collect data from source to storage. After that will be available endpoint.
+Description on endpoints see below
+
 ### ENV
 If some env is changed, need to edit docker-compose.test.yml
 ````
@@ -16,22 +19,30 @@ FILE_NAME=  In case if data source is unavailable put json file to ./local/ and 
 
 ### Run
 Run by
-`docker-compose up -d`
-after containers up by
-`go run ./main.go`
+`docker-compose up -d` after containers up, run `go run ./main.go`
 
 ### Test
 Run by `make test`
 
 
-### HTTP methods
+### HTTP API methods & responses
 ````
 GET /api/v1/parking/id/{ID}
-Responses parking info
+Response
+{
+    "success": true,
+    "message": "",
+    "parking": {...}
+}
 ````
 ````
 GET /api/v1/parking/global-id/{ID}
-Responses parking info
+Response
+{
+    "success": true,
+    "message": "OK",
+    "parking": {...}
+}
 ````
 ````
 POST /api/v1/parking/mode
@@ -43,5 +54,10 @@ per_page    result per page (default is 5)
 Body required
 {"mode":""}
 
-Responses parking info
+Response
+{
+    "success": true,
+    "message": "OK",
+    "parking": [{...},{...}]
+}
 ````
