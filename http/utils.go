@@ -11,8 +11,7 @@ import (
 
 // GetParkingFromSource makes HTTP request to url and parses data Parking struct.
 // If URL is unavailable then reads local file
-func GetParkingFromSource(fileName string) (parkings models.Parkings, err error) {
-	url := "https://data.gov.ru/opendata/7704786030-taxiparking/data-20190906T0100.json?encoding=UTF-8"
+func GetParkingFromSource(url, fileName string) (parkings models.Parkings, err error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return

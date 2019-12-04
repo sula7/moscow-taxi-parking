@@ -13,7 +13,7 @@ import (
 func setupTest(t *testing.T) *Storage {
 	cfg, err := config.Get()
 	require.NoError(t, err)
-	store, err := New(cfg.DSN, cfg.DBPwd)
+	store, err := New(cfg.DbDSN, cfg.DBPwd)
 	require.NoError(t, err)
 	return store
 }

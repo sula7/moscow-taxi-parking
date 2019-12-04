@@ -18,7 +18,7 @@ func main() {
 		}).Fatalln("unable to get env config:", err)
 	}
 
-	parkings, err := http.GetParkingFromSource(conf.FileName)
+	parkings, err := http.GetParkingFromSource(conf.SourceURL, conf.FileName)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"function:": "http.GetParkingFromSource()",
@@ -26,7 +26,7 @@ func main() {
 		}).Fatalln("error while http GET")
 	}
 
-	store, err := storage.New(conf.DSN, conf.DBPwd)
+	store, err := storage.New(conf.DbDSN, conf.DBPwd)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"function:": "http.storage.New()",

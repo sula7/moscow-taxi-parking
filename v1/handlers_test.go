@@ -16,7 +16,7 @@ import (
 func setupTest(t *testing.T) *V1 {
 	cfg, err := config.Get()
 	require.NoError(t, err)
-	store, err := storage.New(cfg.DSN, cfg.DBPwd)
+	store, err := storage.New(cfg.DbDSN, cfg.DBPwd)
 	require.NoError(t, err)
 	v1 := &V1{store: store}
 	return v1

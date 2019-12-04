@@ -10,6 +10,7 @@ services:
     network_mode: host
     environment:
       - DB_CONN=localhost:6379
+      - SRC_URL=https://data.gov.ru/opendata/7704786030-taxiparking/data-20190906T0100.json?encoding=UTF-8
     working_dir: /moscow-taxi-parking/
     volumes:
       - ./:/moscow-taxi-parking/
