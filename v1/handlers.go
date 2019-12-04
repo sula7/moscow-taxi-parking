@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"database/sql"
 	"net/http"
 	"strconv"
 
@@ -11,8 +10,7 @@ import (
 )
 
 var (
-	incorrectDataFormat = "incorrect data format"
-	noInfoOnThisID      = "No info on this ID. Check again, please"
+	incorrectDataFormat = "Incorrect data format, must be Content-type Application/JSON"
 )
 
 func ping(c echo.Context) error {
@@ -23,12 +21,6 @@ func (v1 V1) parkingInfoByID(c echo.Context) error {
 	parking, err := v1.store.GetParkingById(c.Param("id"))
 
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return c.JSON(http.StatusInternalServerError, models.Response{
-				Success: false,
-				Message: noInfoOnThisID,
-			})
-		}
 		return c.JSON(http.StatusInternalServerError, models.Response{
 			Success: false,
 			Message: err.Error(),
@@ -46,12 +38,6 @@ func (v1 V1) parkingInfoByGlobalID(c echo.Context) error {
 	parking, err := v1.store.GetParkingByGlobalId(c.Param("id"))
 
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return c.JSON(http.StatusInternalServerError, models.Response{
-				Success: false,
-				Message: noInfoOnThisID,
-			})
-		}
 		return c.JSON(http.StatusInternalServerError, models.Response{
 			Success: false,
 			Message: err.Error(),
@@ -78,6 +64,11 @@ func (v1 V1) parkingInfoByMode(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, incorrectDataFormat)
 	}
 
+	if page == 0 && perPage == 0 {
+		page = 1
+		perPage = 5
+	}
+
 	request := models.Request{}
 	err = c.Bind(&request)
 	if err != nil {
@@ -86,12 +77,6 @@ func (v1 V1) parkingInfoByMode(c echo.Context) error {
 
 	parking, err := v1.store.GetParkingsByMode(request.Mode, page, perPage)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return c.JSON(http.StatusInternalServerError, models.Response{
-				Success: false,
-				Message: noInfoOnThisID,
-			})
-		}
 		return c.JSON(http.StatusInternalServerError, models.Response{
 			Success: false,
 			Message: err.Error(),

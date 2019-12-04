@@ -8,21 +8,15 @@ import (
 )
 
 type (
-	ParkingHandlers interface {
-		ping(c echo.Context) error
-		parkingInfoByID(c echo.Context) error
-	}
-
 	V1 struct {
-		ParkingHandlers
-		store storage.ParkingStorage
+		store *storage.Storage
 	}
 )
 
-func NewAPI(store storage.ParkingStorage, bindAddress string) {
+func NewAPI(store *storage.Storage, bindPort string) {
 	e := echo.New()
 
-	v1 := V1{
+	v1 := &V1{
 		store: store,
 	}
 
@@ -31,10 +25,10 @@ func NewAPI(store storage.ParkingStorage, bindAddress string) {
 
 	e.GET("/ping", ping)
 
-	groupRU := e.Group("/api/v1")
-	groupRU.GET("/parking/id/:id", v1.parkingInfoByID)
-	groupRU.GET("/parking/global-id/:id", v1.parkingInfoByGlobalID)
-	groupRU.POST("/parking/mode", v1.parkingInfoByMode)
+	g := e.Group("/api/v1")
+	g.GET("/parking/id/:id", v1.parkingInfoByID)
+	g.GET("/parking/global-id/:id", v1.parkingInfoByGlobalID)
+	g.POST("/parking/mode", v1.parkingInfoByMode)
 
-	e.Logger.Fatal(e.Start(bindAddress))
+	e.Logger.Fatal(e.Start(bindPort))
 }

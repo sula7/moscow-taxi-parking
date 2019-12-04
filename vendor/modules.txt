@@ -1,5 +1,7 @@
 # github.com/caarlos0/env/v6 v6.1.0
 github.com/caarlos0/env/v6
+# github.com/davecgh/go-spew v1.1.1
+github.com/davecgh/go-spew/spew
 # github.com/dgrijalva/jwt-go v3.2.0+incompatible
 github.com/dgrijalva/jwt-go
 # github.com/go-redis/redis/v7 v7.0.0-beta.4
@@ -10,7 +12,7 @@ github.com/go-redis/redis/v7/internal/hashtag
 github.com/go-redis/redis/v7/internal/pool
 github.com/go-redis/redis/v7/internal/proto
 github.com/go-redis/redis/v7/internal/util
-# github.com/konsorten/go-windows-terminal-sequences v1.0.2
+# github.com/konsorten/go-windows-terminal-sequences v1.0.1
 github.com/konsorten/go-windows-terminal-sequences
 # github.com/labstack/echo/v4 v4.1.11
 github.com/labstack/echo/v4
@@ -24,8 +26,13 @@ github.com/labstack/gommon/random
 github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.9
 github.com/mattn/go-isatty
-# github.com/sirupsen/logrus v1.4.1
+# github.com/pmezard/go-difflib v1.0.0
+github.com/pmezard/go-difflib/difflib
+# github.com/sirupsen/logrus v1.4.2
 github.com/sirupsen/logrus
+# github.com/stretchr/testify v1.4.0
+github.com/stretchr/testify/assert
+github.com/stretchr/testify/require
 # github.com/valyala/bytebufferpool v1.0.0
 github.com/valyala/bytebufferpool
 # github.com/valyala/fasttemplate v1.0.1
@@ -33,12 +40,14 @@ github.com/valyala/fasttemplate
 # golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
 golang.org/x/crypto/acme
 golang.org/x/crypto/acme/autocert
-# golang.org/x/net v0.0.0-20190603091049-60506f45cf65
+# golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3
 golang.org/x/net/idna
 # golang.org/x/sys v0.0.0-20190813064441-fde4db37ae7a
 golang.org/x/sys/unix
-# golang.org/x/text v0.3.2
+# golang.org/x/text v0.3.0
 golang.org/x/text/secure/bidirule
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 golang.org/x/text/transform
+# gopkg.in/yaml.v2 v2.2.2
+gopkg.in/yaml.v2

@@ -25,8 +25,8 @@ Responses parking info
 POST /api/v1/parking/mode
 
 Params required
-page=       page
-per_page    result per page
+page=       page (default is 1)
+per_page    result per page (default is 5)
 
 Body required
 {"mode":""}
@@ -39,3 +39,6 @@ Run by
 `docker-compose up -d`
 after containers up by
 `go run ./main.go`
+
+### How to test
+Run by `make test`
