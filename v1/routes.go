@@ -8,11 +8,13 @@ import (
 )
 
 type (
+	// V1 is link to Storage struct that contains DB connection
 	V1 struct {
 		store *storage.Storage
 	}
 )
 
+// NewAPI ups endpoints and listens to port. Starts HTTP server
 func NewAPI(store *storage.Storage, bindPort string) {
 	e := echo.New()
 

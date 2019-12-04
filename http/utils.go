@@ -9,6 +9,8 @@ import (
 	"github.com/sula7/moscow-taxi-parking/models"
 )
 
+// GetParkingFromSource makes HTTP request to url and parses data Parking struct.
+// If URL is unavailable then reads local file
 func GetParkingFromSource(fileName string) (parkings models.Parkings, err error) {
 	url := "https://data.gov.ru/opendata/7704786030-taxiparking/data-20190906T0100.json?encoding=UTF-8"
 	req, err := http.NewRequest("GET", url, nil)
@@ -44,6 +46,7 @@ func GetParkingFromSource(fileName string) (parkings models.Parkings, err error)
 	return parkings, nil
 }
 
+// ReadLocalJson reads local .json and parses it to []byte
 func ReadLocalJson(fileName string) ([]byte, error) {
 	byteFile, err := os.Open("./local/" + fileName)
 	if err != nil {

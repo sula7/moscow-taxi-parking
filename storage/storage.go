@@ -9,11 +9,13 @@ import (
 )
 
 type (
+	// Storage contains DB connection
 	Storage struct {
 		db *redis.Client
 	}
 )
 
+// New creates new storage instance that contains DB connection and try to send ping message to DB
 func New(DSN, DbPWD string) (*Storage, error) {
 	dbConn := redis.NewClient(&redis.Options{
 		Addr:     DSN,
@@ -28,10 +30,12 @@ func New(DSN, DbPWD string) (*Storage, error) {
 	return &Storage{db: dbConn}, nil
 }
 
+// Close closes DB connection
 func (s *Storage) Close() {
 	_ = s.db.Close()
 }
 
+// CreateParking creates parking info into DB
 func (s *Storage) CreateParking(parking models.Parking) error {
 	pipe := s.db.TxPipeline()
 
@@ -66,6 +70,7 @@ func (s *Storage) CreateParking(parking models.Parking) error {
 	return nil
 }
 
+// CreateParkings creates parkings info into DB
 func (s *Storage) CreateParkings(parkings models.Parkings) error {
 	pipe := s.db.TxPipeline()
 
@@ -102,10 +107,12 @@ func (s *Storage) CreateParkings(parkings models.Parkings) error {
 	return nil
 }
 
+// GetParkingById gets all parking info by ID from DB
 func (s *Storage) GetParkingById(parkingID string) (parking map[string]string, err error) {
 	return s.db.HGetAll(parkingID).Result()
 }
 
+// GetParkingById gets all parking info by global_id from DB
 func (s *Storage) GetParkingByGlobalId(globalID string) (parking map[string]string, err error) {
 	id, err := s.db.Get("global_id:" + globalID).Result()
 	if err != nil {
@@ -115,6 +122,7 @@ func (s *Storage) GetParkingByGlobalId(globalID string) (parking map[string]stri
 	return s.db.HGetAll(id).Result()
 }
 
+// GetParkingsByMode gets all parking info by global_id from DB. Needs to set page and perPage for pagination
 func (s *Storage) GetParkingsByMode(mode string, page, maxParkingsPerPage int64) (parking []map[string]string, err error) {
 	IDs, err := s.db.LRange("mode:"+mode, (page-1)*maxParkingsPerPage, (page-1)*maxParkingsPerPage+(maxParkingsPerPage-1)).Result()
 	if err != nil {
@@ -132,6 +140,7 @@ func (s *Storage) GetParkingsByMode(mode string, page, maxParkingsPerPage int64)
 	return parking, nil
 }
 
+// RemoveParkingByID removes all info about parking by ID
 func (s *Storage) RemoveParkingByID(parkingID string) error {
 	_, err := s.db.Del(parkingID).Result()
 	return err

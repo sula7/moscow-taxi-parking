@@ -1,26 +1,31 @@
 package models
 
 type (
+	// Response using at HTTP response
 	Response struct {
 		Success bool              `json:"success"`
 		Message string            `json:"message"`
 		Parking map[string]string `json:"parking"`
 	}
 
+	// ListResponse using at HTTP response if need JSON object with multiple content
 	ListResponse struct {
 		Success  bool                `json:"success"`
 		Message  string              `json:"message"`
 		Parkings []map[string]string `json:"parking"`
 	}
 
+	// Request using for find by mode. Request binds to this struct
 	Request struct {
 		Mode string `json:"mode"`
 	}
 
+	// Parkings is using if need multiple data in requests or responses (JSON objects)
 	Parkings struct {
 		Parking []Parking
 	}
 
+	// Parking is a content of JSON object. Using if need request or response
 	Parking struct {
 		Id               int64  `json:"ID,omitempty"form:"id"`
 		GlobalID         int64  `json:"global_id,omitempty"form:"global_id"`

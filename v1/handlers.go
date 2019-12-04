@@ -13,10 +13,12 @@ var (
 	incorrectDataFormat = "Incorrect data format, must be Content-type Application/JSON"
 )
 
+// ping is use for test DB connection. Must response pong if DB connection is ok
 func ping(c echo.Context) error {
 	return c.String(http.StatusOK, "pong")
 }
 
+// parkingInfoByID gets all parking info from DB by ID
 func (v1 V1) parkingInfoByID(c echo.Context) error {
 	parking, err := v1.store.GetParkingById(c.Param("id"))
 
@@ -34,6 +36,7 @@ func (v1 V1) parkingInfoByID(c echo.Context) error {
 	})
 }
 
+// parkingInfoByGlobalID gets all parking info from DB by global_id
 func (v1 V1) parkingInfoByGlobalID(c echo.Context) error {
 	parking, err := v1.store.GetParkingByGlobalId(c.Param("id"))
 
@@ -51,6 +54,7 @@ func (v1 V1) parkingInfoByGlobalID(c echo.Context) error {
 	})
 }
 
+// parkingInfoByMode gets all parking info from DB by global_id
 func (v1 V1) parkingInfoByMode(c echo.Context) error {
 	qParamPage := c.QueryParam("page")
 	page, err := strconv.ParseInt(qParamPage, 10, 64)
