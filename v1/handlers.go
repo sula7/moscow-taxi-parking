@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 
@@ -23,6 +24,7 @@ func (v1 V1) parkingInfoByID(c echo.Context) error {
 	parking, err := v1.store.GetParkingById(c.Param("id"))
 
 	if err != nil {
+		logrus.Errorln("couldn't get parking info from DB by ID:", err)
 		return c.JSON(http.StatusInternalServerError, models.Response{
 			Success: false,
 			Message: err.Error(),
@@ -41,6 +43,7 @@ func (v1 V1) parkingInfoByGlobalID(c echo.Context) error {
 	parking, err := v1.store.GetParkingByGlobalId(c.Param("id"))
 
 	if err != nil {
+		logrus.Errorln("couldn't get parking info from DB by global ID:", err)
 		return c.JSON(http.StatusInternalServerError, models.Response{
 			Success: false,
 			Message: err.Error(),
@@ -59,12 +62,14 @@ func (v1 V1) parkingInfoByMode(c echo.Context) error {
 	qParamPage := c.QueryParam("page")
 	page, err := strconv.ParseInt(qParamPage, 10, 64)
 	if err != nil {
+		logrus.Errorln("couldn't parse param page to int:", err)
 		return echo.NewHTTPError(http.StatusBadRequest, incorrectDataFormat)
 	}
 
 	qParamPerPage := c.QueryParam("per_page")
 	perPage, err := strconv.ParseInt(qParamPerPage, 10, 64)
 	if err != nil {
+		logrus.Errorln("couldn't parse parse per_page to int:", err)
 		return echo.NewHTTPError(http.StatusBadRequest, incorrectDataFormat)
 	}
 
@@ -76,11 +81,13 @@ func (v1 V1) parkingInfoByMode(c echo.Context) error {
 	request := models.Request{}
 	err = c.Bind(&request)
 	if err != nil {
+		logrus.Errorln("couldn't bind request body to struct:", err)
 		return echo.NewHTTPError(http.StatusBadRequest, incorrectDataFormat)
 	}
 
 	parking, err := v1.store.GetParkingsByMode(request.Mode, page, perPage)
 	if err != nil {
+		logrus.Errorln("couldn't get parking info from DB by mode:", err)
 		return c.JSON(http.StatusInternalServerError, models.Response{
 			Success: false,
 			Message: err.Error(),

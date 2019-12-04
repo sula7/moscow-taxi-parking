@@ -116,7 +116,7 @@ func (s *Storage) GetParkingById(parkingID string) (parking map[string]string, e
 func (s *Storage) GetParkingByGlobalId(globalID string) (parking map[string]string, err error) {
 	id, err := s.db.Get("global_id:" + globalID).Result()
 	if err != nil {
-		return parking, err
+		return
 	}
 
 	return s.db.HGetAll(id).Result()
@@ -126,13 +126,13 @@ func (s *Storage) GetParkingByGlobalId(globalID string) (parking map[string]stri
 func (s *Storage) GetParkingsByMode(mode string, page, maxParkingsPerPage int64) (parking []map[string]string, err error) {
 	IDs, err := s.db.LRange("mode:"+mode, (page-1)*maxParkingsPerPage, (page-1)*maxParkingsPerPage+(maxParkingsPerPage-1)).Result()
 	if err != nil {
-		return parking, err
+		return
 	}
 
 	for _, ID := range IDs {
 		parkingInfo, err := s.db.HGetAll(ID).Result()
 		if err != nil {
-			return parking, err
+			return
 		}
 		parking = append(parking, parkingInfo)
 	}

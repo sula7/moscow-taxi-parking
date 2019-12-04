@@ -15,7 +15,7 @@ func main() {
 		logrus.WithFields(logrus.Fields{
 			"function:": "config.Get()",
 			"err:":      err,
-		}).Fatalln("unable to get env config:", err)
+		}).Fatalln("couldn't get env config:")
 	}
 
 	parkings, err := http.GetParkingFromSource(conf.SourceURL, conf.FileName)
@@ -23,7 +23,7 @@ func main() {
 		logrus.WithFields(logrus.Fields{
 			"function:": "http.GetParkingFromSource()",
 			"err:":      err,
-		}).Fatalln("error while http GET")
+		}).Fatalln("couldn't GET data from source")
 	}
 
 	store, err := storage.New(conf.DbDSN, conf.DBPwd)
@@ -31,7 +31,7 @@ func main() {
 		logrus.WithFields(logrus.Fields{
 			"function:": "http.storage.New()",
 			"err:":      err,
-		}).Fatalln("error establishing connection to DB")
+		}).Fatalln("couldn't connect to DB")
 	}
 
 	defer store.Close()
@@ -41,7 +41,7 @@ func main() {
 		logrus.WithFields(logrus.Fields{
 			"function:": "store.CreateParkings()",
 			"err:":      err,
-		}).Fatalln("error creating parkings info in DB")
+		}).Fatalln("couldn't create parkings info in DB")
 	}
 
 	v1.NewAPI(store, conf.BindPort)
